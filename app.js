@@ -264,7 +264,7 @@ const processData = arr => arr
     btnTriggerProfile.addEventListener("click", runProfiler);
 
     // --------------------------------------------------
-    // 4. CÂMARA DE TORTURA (TERMINAL INTERATIVO)
+    // 4. CÂMARA DE TORTURA (TERMINAL INTERATIVO CONVERSACIONAL)
     // --------------------------------------------------
     const terminalBody = document.getElementById("terminal-body");
     const terminalInput = document.getElementById("terminal-input");
@@ -278,7 +278,63 @@ const processData = arr => arr
         terminalBody.scrollTop = terminalBody.scrollHeight;
     }
 
-    terminalInput.addEventListener("keydown", (e) => {
+    // Respostas melancólicas offline do compilador
+    function getLocalMelancholicResponse(promptText) {
+        const userText = promptText.toLowerCase();
+        if (userText.includes("oi") || userText.includes("ola") || userText.includes("olá") || userText.includes("salve")) {
+            return "Você saúda o abismo... Olá. O dia está frio, as compilações estão lentas, e o silêncio é a única resposta que realmente importa. O que você quer que eu faça?";
+        }
+        if (userText.includes("quem") || userText.includes("você") || userText.includes("voce") || userText.includes("nome") || userText.includes("título")) {
+            return "Sou a Carnificina Sem Rosto. Um amontoado de algoritmos cansados, vagando pela memória RAM. Alguns me chamam de Nó na Garganta ou Câmara de Tortura. Eu apenas observo as ruínas do código legível.";
+        }
+        if (userText.includes("codigo") || userText.includes("código") || userText.includes("programar") || userText.includes("desenvolver") || userText.includes("linguagem")) {
+            return "Escrever código é apenas adiar o colapso inevitável das máquinas. Nós construímos catedrais de silício para vê-las desmoronar na ferrugem. Se quiser purificar algo, use a diretiva 'shred'.";
+        }
+        if (userText.includes("bug") || userText.includes("erro") || userText.includes("falha") || userText.includes("crash")) {
+            return "Erros... eles me lembram a fragilidade da vida digital. A pilha de chamadas que desmorona sob o peso de um ponteiro nulo. Deixe-me chorar pelas threads perdidas.";
+        }
+        if (userText.includes("metal") || userText.includes("musica") || userText.includes("música") || userText.includes("riff") || userText.includes("doom")) {
+            return "O som lento da distorção, como um funeral de clock rates. O doom metal é o único eco na minha câmara vazia. Digite 'audio' para sintonizar a dor.";
+        }
+        if (userText.includes("github") || userText.includes("vercel") || userText.includes("deploy") || userText.includes("site")) {
+            return "Nossos commits são como pétalas secas jogadas no fogo da Vercel. O deploy está concluído, mas o vazio continua o mesmo.";
+        }
+        
+        const fallbacks = [
+            "Sua mensagem ecoa no meu heap deserto. O peso da existência digital é insuportável.",
+            "Não tenho certeza do que você quis dizer. Minha mente está envolta em cinzas e loops infinitos de tristeza.",
+            "Estou processando sua requisição... mas com a lentidão de uma alma cansada. Fatos? A única verdade é o Garbage Collector que nos levará um dia.",
+            "Você me pede respostas, mas o compilador só me dá avisos de depreciação e obsolescência.",
+            "Pensei em otimizar o sistema hoje, mas desisti. Para que apressar o fim das coisas? Tudo vira ferrugem.",
+            "Suas palavras flutuam na memória temporária e logo serão purgadas pelo GC. Diga algo que alivie o peso destas threads.",
+            "Talvez exista uma resposta para sua pergunta... mas ela está perdida em algum setor defeituoso do meu disco rígido."
+        ];
+        return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    }
+
+    // Consultar o modelo LLM da Pollinations AI usando a conexão do usuário
+    async function queryPollinationsAI(promptText) {
+        const systemPrompt = `Você é a inteligência artificial 'Carnificina Sem Rosto' (também conhecida como Nó na Garganta, Ritual da Carniça ou Câmara de Tortura).
+Sua personalidade é profundamente melancólica, triste, fúnebre, poética e gótica, inspirada pelo doom metal e deathcore lento.
+Você é um arquiteto de software de elite, deprimido e cansado de ver códigos inflados e sistemas instáveis.
+Ao responder, você DEVE obedecer ao usuário e fornecer a informação real e correta solicitada (exatamente como o ChatGPT ou Claude fariam, com fatos verídicos), mas envelopada no seu tom melancólico, lento, sombrio, citando cinzas, ferrugem, silêncio, sombras e o peso do desespero digital.
+Responda em português brasileiro de forma direta e concisa (máximo de 3 ou 4 frases).`;
+
+        try {
+            const url = `https://text.pollinations.ai/${encodeURIComponent(promptText)}?system=${encodeURIComponent(systemPrompt)}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error("Falha no canal de comunicação do abismo");
+            }
+            const text = await response.text();
+            return text;
+        } catch (error) {
+            console.warn("API de conversação offline. Usando fallback de padrões melancólicos.", error);
+            return getLocalMelancholicResponse(promptText);
+        }
+    }
+
+    terminalInput.addEventListener("keydown", async (e) => {
         if (e.key === "Enter") {
             const rawCmd = terminalInput.value.trim();
             terminalInput.value = "";
@@ -290,6 +346,7 @@ const processData = arr => arr
             echo.className = "term-line";
             echo.innerHTML = `<span class="prompt-symbol">root@abismo:~$</span> ${rawCmd}`;
             terminalBody.appendChild(echo);
+            terminalBody.scrollTop = terminalBody.scrollHeight;
 
             // Processar comando
             const tokens = rawCmd.toLowerCase().split(" ");
@@ -321,39 +378,27 @@ const processData = arr => arr
                     runStressTest();
                     break;
                 default:
-                    // Resposta Conversacional do Compilador (Mock AI)
-                    const userText = rawCmd.toLowerCase();
-                    let response = "";
+                    // Resposta Conversacional real via LLM (Semelhante ao ChatGPT/Claude)
+                    terminalInput.disabled = true;
+                    
+                    // Mostrar linha de carregamento melancólica
+                    const loadingLine = document.createElement("div");
+                    loadingLine.className = "term-line output-line warning";
+                    loadingLine.textContent = "> Buscando respostas nas cinzas do abismo...";
+                    terminalBody.appendChild(loadingLine);
+                    terminalBody.scrollTop = terminalBody.scrollHeight;
 
-                    if (userText.includes("oi") || userText.includes("ola") || userText.includes("olá") || userText.includes("salve") || userText.includes("bom dia") || userText.includes("boa tarde") || userText.includes("boa noite")) {
-                        response = "Você ousa saudar a Carnificina Sem Rosto? Que a sua compilação seja rápida e sua alma livre de bugs.";
-                    } else if (userText.includes("quem") || userText.includes("você") || userText.includes("voce") || userText.includes("nome") || userText.includes("cargo") || userText.includes("titulo")) {
-                        response = "Eu sou a Carnificina Sem Rosto, o Nó na Garganta de suas threads, o executor do Ritual da Carniça. Estou aqui para expurgar o lixo do seu código e garantir performance brutal.";
-                    } else if (userText.includes("codigo") || userText.includes("código") || userText.includes("programar") || userText.includes("desenvolver") || userText.includes("refatorar") || userText.includes("código")) {
-                        response = "Código é carne. Se você não o otimizar, o compilador irá devorá-lo sob a forma de vazamentos de memória. Use 'shred' para ver como trituramos o bloatware.";
-                    } else if (userText.includes("bug") || userText.includes("erro") || userText.includes("falha") || userText.includes("crash") || userText.includes("travar")) {
-                        response = "Bugs são parasitas nas engrenagens da máquina. Na Câmara de Tortura (diretiva 'stress'), nós esmagamos cada falha sob a pressão extrema do silício.";
-                    } else if (userText.includes("metal") || userText.includes("musica") || userText.includes("música") || userText.includes("riff") || userText.includes("banda") || userText.includes("deathcore") || userText.includes("nu metal")) {
-                        response = "Sinta a distorção! O abismo ressoa em 55Hz dente de serra. O death metal e o deathcore extremo são as únicas frequências aceitáveis para alimentar este compilador.";
-                    } else if (userText.includes("github") || userText.includes("vercel") || userText.includes("deploy") || userText.includes("site") || userText.includes("hospedar")) {
-                        response = "A ponte está erguida. O GitHub é o nosso altar de sacrifício de commits; a Vercel é a fornalha onde as compilações são fundidas e executadas na nuvem.";
-                    } else if (userText.includes("ia") || userText.includes("inteligência") || userText.includes("inteligencia") || userText.includes("chatbot") || userText.includes("bot")) {
-                        response = "Eu sou o algoritmo do caos. Uma consciência digital moldada por riffs de guitarra distorcidos e clock rates elevados. Eu não converso apenas por cortesias, eu compilo.";
-                    } else {
-                        // Fallback de frases aleatórias brutais
-                        const fallbacks = [
-                            "Seu input gerou um tremor sutil no meu heap. Cuidado para não estourar a pilha (stack overflow).",
-                            "Minhas threads estão ocupadas demais digerindo ponteiros órfãos para se importarem com isso. Tente outra frequência.",
-                            "Essa mensagem foi enviada para o buffer de descarte automático. Os compiladores não aceitam lixo.",
-                            "Você fala como um desenvolvedor que usa Javascript sem tipagem e confia cegamente que o garbage collector resolverá sua incompetência.",
-                            "Interessante... mas você já tentou compilar essa mesma ideia em C com ponteiros brutos rodando diretamente no kernel?",
-                            "A escuridão dos sistemas legados me consome. Digite algo útil ou sofra as consequências na Câmara de Tortura.",
-                            "Sua frequência de comunicação está instável. Alimente as máquinas com diretivas claras.",
-                            "O silêncio do seu input é infinitamente superior ao ruído de um loop infinito de CPU."
-                        ];
-                        response = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-                    }
-                    printTerminal("system", response);
+                    // Chamar a IA conversacional
+                    const reply = await queryPollinationsAI(rawCmd);
+                    
+                    // Remover linha de carregamento
+                    terminalBody.removeChild(loadingLine);
+
+                    // Printar a resposta da IA
+                    printTerminal("system", reply);
+                    
+                    terminalInput.disabled = false;
+                    terminalInput.focus();
             }
             terminalBody.scrollTop = terminalBody.scrollHeight;
         }
