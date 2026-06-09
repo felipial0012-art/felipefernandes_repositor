@@ -7,7 +7,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     // --------------------------------------------------
     // 1. ÁUDIO DO ABISMO (WEB AUDIO API)
-    // --------------------------------------------------    let audioCtx = null;
+    // --------------------------------------------------
+    let audioCtx = null;
     let gainNode = null;
     let isSoundPlaying = false;
     let schedulerInterval = null;
