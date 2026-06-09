@@ -7,57 +7,194 @@
 document.addEventListener("DOMContentLoaded", () => {
     // --------------------------------------------------
     // 1. ÁUDIO DO ABISMO (WEB AUDIO API)
-    // --------------------------------------------------
-    let audioCtx = null;
-    let mainOscillator = null;
-    let modulatorOsc = null;
-    let filterNode = null;
+    // --------------------------------------------------    let audioCtx = null;
     let gainNode = null;
     let isSoundPlaying = false;
+    let schedulerInterval = null;
+    let nextBeatTime = 0;
+    let beatCount = 0;
+    const tempo = 65; // Doom metal lento
+    const secondsPerBeat = 60.0 / tempo;
+    let noiseBuffer = null;
 
     const btnToggleSound = document.getElementById("btn-toggle-sound");
     const soundStatus = document.getElementById("sound-status");
 
+    function getNoiseBuffer() {
+        if (!noiseBuffer && audioCtx) {
+            const bufferSize = audioCtx.sampleRate * 0.4;
+            noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+        }
+        return noiseBuffer;
+    }
+
+    function playKick(time) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(gainNode);
+
+        osc.frequency.setValueAtTime(140, time);
+        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.35);
+
+        gain.gain.setValueAtTime(1.0, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+
+        osc.start(time);
+        osc.stop(time + 0.36);
+    }
+
+    function playSnare(time) {
+        if (!audioCtx) return;
+        const buffer = getNoiseBuffer();
+        if (!buffer) return;
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 1000;
+        filter.Q.value = 2;
+
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.5, time);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(gainNode);
+
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(180, time);
+        oscGain.gain.setValueAtTime(0.3, time);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+        osc.connect(oscGain);
+        oscGain.connect(gainNode);
+
+        noise.start(time);
+        noise.stop(time + 0.31);
+        osc.start(time);
+        osc.stop(time + 0.16);
+    }
+
+    function playHiHat(time) {
+        if (!audioCtx) return;
+        const buffer = getNoiseBuffer();
+        if (!buffer) return;
+
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "highpass";
+        filter.frequency.value = 7500;
+
+        const hatGain = audioCtx.createGain();
+        hatGain.gain.setValueAtTime(0.08, time);
+        hatGain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+        source.connect(filter);
+        filter.connect(hatGain);
+        hatGain.connect(gainNode);
+
+        source.start(time);
+        source.stop(time + 0.06);
+    }
+
+    function makeDistortionCurve(amount) {
+        const k = typeof amount === 'number' ? amount : 50;
+        const n_samples = 44100;
+        const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < n_samples; ++i) {
+            const x = (i * 2) / n_samples - 1;
+            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+        }
+        return curve;
+    }
+
+    const chordFrequencies = [55.0, 43.65, 32.7, 49.0];
+
+    function playRiff(time, noteIndex) {
+        if (!audioCtx) return;
+        const freq = chordFrequencies[noteIndex % chordFrequencies.length];
+
+        const osc1 = audioCtx.createOscillator();
+        osc1.type = "sawtooth";
+        osc1.frequency.setValueAtTime(freq, time);
+
+        const osc2 = audioCtx.createOscillator();
+        osc2.type = "sawtooth";
+        osc2.frequency.setValueAtTime(freq * 1.012, time);
+
+        const dist = audioCtx.createWaveShaper();
+        dist.curve = makeDistortionCurve(120);
+        dist.oversample = "4x";
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(190, time);
+        filter.frequency.linearRampToValueAtTime(140, time + secondsPerBeat * 4);
+
+        const riffGain = audioCtx.createGain();
+        riffGain.gain.setValueAtTime(0.0, time);
+        riffGain.gain.linearRampToValueAtTime(0.35, time + 0.1);
+        riffGain.gain.setValueAtTime(0.35, time + secondsPerBeat * 4 - 0.15);
+        riffGain.gain.linearRampToValueAtTime(0.0, time + secondsPerBeat * 4);
+
+        osc1.connect(dist);
+        osc2.connect(dist);
+        dist.connect(filter);
+        filter.connect(riffGain);
+        riffGain.connect(gainNode);
+
+        osc1.start(time);
+        osc1.stop(time + secondsPerBeat * 4 + 0.05);
+        osc2.start(time);
+        osc2.stop(time + secondsPerBeat * 4 + 0.05);
+    }
+
+    function scheduleBeat(beat, time) {
+        const measureBeat = beat % 4;
+
+        if (measureBeat === 0) {
+            playKick(time);
+            playRiff(time, Math.floor(beat / 4));
+        } else if (measureBeat === 2) {
+            playKick(time);
+            playKick(time + secondsPerBeat * 0.5);
+        } 
+        
+        if (measureBeat === 1 || measureBeat === 3) {
+            playSnare(time);
+        }
+
+        playHiHat(time);
+        playHiHat(time + secondsPerBeat * 0.5);
+    }
+
+    function scheduler() {
+        if (!audioCtx) return;
+        while (nextBeatTime < audioCtx.currentTime + 0.2) {
+            scheduleBeat(beatCount, nextBeatTime);
+            nextBeatTime += secondsPerBeat;
+            beatCount++;
+        }
+    }
+
     function initAudio() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Oscilador principal (Drone de Baixa Frequência - Riff de Baixo)
-            mainOscillator = audioCtx.createOscillator();
-            mainOscillator.type = "sawtooth";
-            mainOscillator.frequency.setValueAtTime(55, audioCtx.currentTime); // Nota A1
-
-            // Modulador para dar sensação de rotação/motor industrial
-            modulatorOsc = audioCtx.createOscillator();
-            modulatorOsc.type = "sine";
-            modulatorOsc.frequency.setValueAtTime(4, audioCtx.currentTime); // LFO a 4Hz
-
-            // Ganho do Modulador
-            const modGain = audioCtx.createGain();
-            modGain.gain.setValueAtTime(15, audioCtx.currentTime); // Desvio de frequência
-
-            // Filtro Passa-Baixas para dar atmosfera abafada/pesada
-            filterNode = audioCtx.createBiquadFilter();
-            filterNode.type = "lowpass";
-            filterNode.frequency.setValueAtTime(120, audioCtx.currentTime);
-            filterNode.Q.setValueAtTime(5, audioCtx.currentTime);
-
-            // Ganho Principal
             gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.0, audioCtx.currentTime); // Silêncio inicial
-
-            // Conexões: Modulador -> Ganho do Modulador -> Freq do Oscilador Principal
-            modulatorOsc.connect(modGain);
-            modGain.connect(mainOscillator.frequency);
-
-            // Conexões de Sinal: Principal -> Filtro -> Ganho -> Destino
-            mainOscillator.connect(filterNode);
-            filterNode.connect(gainNode);
+            gainNode.gain.setValueAtTime(0.0, audioCtx.currentTime);
             gainNode.connect(audioCtx.destination);
-
-            // Iniciar os osciladores
-            mainOscillator.start();
-            modulatorOsc.start();
         }
     }
 
@@ -69,21 +206,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!isSoundPlaying) {
-            // Fade-in suave do drone industrial
-            gainNode.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 1.5);
-            soundStatus.textContent = "CONECTADO A 55Hz";
+            nextBeatTime = audioCtx.currentTime + 0.05;
+            beatCount = 0;
+            scheduler();
+            schedulerInterval = setInterval(scheduler, 100);
+
+            gainNode.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 1.0);
+            
+            soundStatus.textContent = "METAL ATIVO (65 BPM)";
             soundStatus.classList.add("active");
-            btnToggleSound.innerHTML = "<span class='icon'>❌</span> CORTAR RUÍDO INDUSTRIAL";
+            btnToggleSound.innerHTML = "<span class='icon'>❌</span> CORTAR RITUAL DE METAL";
             isSoundPlaying = true;
-            printTerminal("system", "Drone industrial sintonizado. Frequência ativa: 55Hz (A1).");
+            printTerminal("system", "Drone metal melancólico sintonizado. Sequenciador ativo: 65 BPM (Doom/Gothic Riff).");
         } else {
-            // Fade-out suave
-            gainNode.gain.linearRampToValueAtTime(0.0, audioCtx.currentTime + 0.8);
+            clearInterval(schedulerInterval);
+            schedulerInterval = null;
+
+            gainNode.gain.linearRampToValueAtTime(0.0, audioCtx.currentTime + 0.5);
+            
             soundStatus.textContent = "DESATIVADO";
             soundStatus.classList.remove("active");
-            btnToggleSound.innerHTML = "<span class='icon'>⚡</span> CANALIZAR RUÍDO INDUSTRIAL";
+            btnToggleSound.innerHTML = "<span class='icon'>⚡</span> CANALIZAR RUÍDO DE METAL";
             isSoundPlaying = false;
-            printTerminal("warning", "Canal de áudio cortado. Silêncio no abismo.");
+            printTerminal("warning", "Riffs silenciados. Apenas cinzas no canal de áudio.");
         }
     }
 
