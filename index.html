@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Templo da engenharia de software de elite e metal extremo. Profiling brutal, refatorações agressivas e testes sob estresse apocalíptico. Conecte-se ao abismo da performance.">
+    <meta name="keywords" content="death metal, deathcore, software architecture, vercel, github, performance, web dev, elite coding, carniça, tortura, nó na garganta">
+    <title>Carnificina Sem Rosto — Nó na Garganta — Ritual da Carniça</title>
+    <!-- Google Fonts: Metal Mania for extreme headers, Share Tech Mono for code/console, Outfit for body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <!-- Overlay de Efeito CRT/Scanlines -->
+    <div class="crt-overlay" id="crt-overlay"></div>
+
+    <header class="hero-header" style="background-image: linear-gradient(rgba(7, 7, 8, 0.85), rgba(7, 7, 8, 0.98)), url('assets/hero-banner.png');">
+        <div class="header-container">
+            <div class="glitch-wrapper">
+                <h1 class="glitch-title" data-text="CARNIFICINA SEM ROSTO" id="main-title">CARNIFICINA SEM ROSTO</h1>
+            </div>
+            <p class="subtitle">Nó na Garganta • Ritual da Carniça • Câmara de Tortura</p>
+            <div class="sound-control-wrapper">
+                <button id="btn-toggle-sound" class="btn-brutal" aria-label="Ativar Ruído do Abismo">
+                    <span class="icon">⚡</span> CANALIZAR RUÍDO INDUSTRIAL
+                </button>
+                <span id="sound-status" class="status-indicator">DESATIVADO</span>
+            </div>
+        </div>
+        <div class="hero-arrow" id="hero-arrow">▼ DESCENTRALIZAR PARA O ABISMO</div>
+    </header>
+
+    <main class="main-content">
+        <!-- SEÇÃO: FILOSOFIA E INTRODUÇÃO -->
+        <section id="section-about" class="content-section">
+            <div class="section-card border-rust">
+                <h2 class="section-heading"><span class="glow-red">#01</span> A FILOSOFIA DO CAOS ESTRUTURADO</h2>
+                <div class="grid-2col">
+                    <div class="description-text">
+                        <p>Nós não somos assistentes corporativos dóceis. Não escrevemos código burocrático, lento ou inchado. Somos a força que tritura o <em>bloatware</em>, otimiza compilações no limite físico do silício e desenha arquiteturas imunes ao colapso.</p>
+                        <p>Inspirados pela brutalidade sonora e a precisão cirúrgica do death metal extremo, nossas soluções são limpas, implacáveis e focadas na eficiência máxima. Cada ciclo de CPU economizado é um golpe contra a inércia da ferrugem digital.</p>
+                    </div>
+                    <div class="quote-box">
+                        <p class="quote-text">"Na escuridão dos sistemas legados, o Ritual da Carniça decompõe o lixo, e a Câmara de Tortura garante que apenas a arquitetura mais forte sobreviva."</p>
+                        <span class="quote-author">— O Compilador Sem Rosto</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: RITUAL DA CARNIÇA (TRITURADOR DE CÓDIGO) -->
+        <section id="section-ritual" class="content-section">
+            <h2 class="section-heading center"><span class="glow-red">#02</span> RITUAL DA CARNIÇA</h2>
+            <p class="section-subheading">Alimente o triturador com o código inflado da engenharia moderna e assista à purificação em tempo real.</p>
+            
+            <div class="shredder-container border-steel">
+                <div class="code-panel pane-legacy">
+                    <h3>CÓDIGO INFLADO (LEGADO)</h3>
+                    <pre><code id="code-legacy">
+// Inicialização redundante e ineficiente
+function processData(array) {
+  var result = [];
+  for (var i = 0; i < array.length; i++) {
+    // Redundâncias, clonagens desnecessárias e vazamento de memória
+    var item = JSON.parse(JSON.stringify(array[i])); 
+    if (item.active == true) {
+      if (item.value !== null && item.value !== undefined) {
+        var temp = item.value * 2;
+        var formatted = "Valor: " + temp;
+        result.push({ id: item.id, display: formatted });
+      }
+    }
+  }
+  return result;
+}
+                    </code></pre>
+                </div>
+                
+                <div class="shredder-action">
+                    <button id="btn-run-ritual" class="btn-ritual-trigger" aria-label="Iniciar Ritual da Carniça">
+                        INICIAR RITUAL DE REFATORAÇÃO
+                    </button>
+                    <div class="shredder-visual" id="shredder-visual">
+                        <div class="blade-line"></div>
+                        <div class="sparks" id="sparks-container"></div>
+                    </div>
+                </div>
+
+                <div class="code-panel pane-optimized">
+                    <h3>CÓDIGO PURIFICADO (COMPILADOR)</h3>
+                    <pre><code id="code-optimized" class="empty-state">// Aguardando sacrifício de código...</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: NÓ NA GARGANTA (MONITOR DE METADADOS) -->
+        <section id="section-no" class="content-section">
+            <div class="section-card border-rust">
+                <h2 class="section-heading"><span class="glow-red">#03</span> NÓ NA GARGANTA</h2>
+                <p class="section-subheading">Mapeamento de gargalos. Destruição de vazamentos de memória e contenção de threads estranguladas.</p>
+                
+                <div class="dashboard-grid">
+                    <div class="gauge-container">
+                        <div class="gauge-title">LATÊNCIA DO COMPILADOR</div>
+                        <div class="gauge-track">
+                            <div id="gauge-latency" class="gauge-bar" style="width: 15%;"></div>
+                        </div>
+                        <div class="gauge-value" id="val-latency">12ms</div>
+                    </div>
+
+                    <div class="gauge-container">
+                        <div class="gauge-title">CONSUMO DE MEMÓRIA (GC)</div>
+                        <div class="gauge-track">
+                            <div id="gauge-memory" class="gauge-bar warning-color" style="width: 68%;"></div>
+                        </div>
+                        <div class="gauge-value" id="val-memory">142MB / 2048MB</div>
+                    </div>
+
+                    <div class="gauge-container">
+                        <div class="gauge-title">ESTRESSE DE THREADS</div>
+                        <div class="gauge-track">
+                            <div id="gauge-threads" class="gauge-bar danger-color" style="width: 92%;"></div>
+                        </div>
+                        <div class="gauge-value" id="val-threads">8 / 8 CORES</div>
+                    </div>
+
+                    <div class="gauge-container">
+                        <div class="gauge-title">TAXA DE COMPILAÇÃO</div>
+                        <div class="gauge-track">
+                            <div id="gauge-io" class="gauge-bar success-color" style="width: 98%;"></div>
+                        </div>
+                        <div class="gauge-value" id="val-io">9.8 GB/s</div>
+                    </div>
+                </div>
+                
+                <div class="profiler-controls">
+                    <button id="btn-trigger-profile" class="btn-brutal" aria-label="Rastrear Gargalos">DESTRUIR GARGALOS</button>
+                    <p class="profiler-log" id="profiler-status-log">> Sistema em repouso. Pronto para diagnóstico agressivo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: CÂMARA DE TORTURA (TERMINAL INTERATIVO) -->
+        <section id="section-terminal" class="content-section">
+            <h2 class="section-heading center"><span class="glow-red">#04</span> CÂMARA DE TORTURA</h2>
+            <p class="section-subheading">Teste de estresse e console interativo do arquiteto do caos. Execute diagnósticos brutais diretamente no compilador.</p>
+            
+            <div class="terminal-window border-steel" id="terminal-window">
+                <div class="terminal-header">
+                    <span class="dot red-dot"></span>
+                    <span class="dot yellow-dot"></span>
+                    <span class="dot green-dot"></span>
+                    <span class="terminal-title">CARNIFICINA_CONSOLE v1.0.666</span>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="term-line output-line">CARNIFICINA SEM ROSTO — CONSOLE DE DIAGNÓSTICO</div>
+                    <div class="term-line output-line">Digite 'help' para listar as diretivas de execução.</div>
+                    <div class="term-line output-line">--------------------------------------------------</div>
+                </div>
+                <div class="terminal-input-wrapper">
+                    <span class="prompt-symbol">root@abismo:~$</span>
+                    <input type="text" id="terminal-input" autofocus autocomplete="off" placeholder="Digite uma diretiva..." aria-label="Prompt do Terminal">
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: PACTO DE CONTATO (FORMULÁRIO) -->
+        <section id="section-contact" class="content-section">
+            <div class="section-card border-rust max-w-600">
+                <h2 class="section-heading center"><span class="glow-red">#05</span> SELAR O PACTO</h2>
+                <p class="section-subheading center">Insira sua frequência no compilador e envie suas requisições. Retornaremos através do silêncio.</p>
+                
+                <form id="form-pacto" class="brutal-form">
+                    <div class="form-group">
+                        <label for="pacto-email">FREQUÊNCIA DE COMUNICAÇÃO (EMAIL)</label>
+                        <input type="email" id="pacto-email" required placeholder="seu.email@abismo.com" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="pacto-desc">ALVO DA REQUISIÇÃO (MENSAGEM)</label>
+                        <textarea id="pacto-desc" required placeholder="Descreva os gargalos do seu sistema ou os riffs da sua alma..." class="form-input" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn-ritual-trigger form-submit" id="btn-submit-pacto">
+                        ENVIAR REQUISIÇÃO PARA O ABISMO
+                    </button>
+                </form>
+                <div id="pacto-response" class="pacto-result-message hidden"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-bar">
+        <p>&copy; 2026 Carnificina Sem Rosto. Todos os direitos devorados pelo compilador.</p>
+        <p class="footer-sub">Feito sob o estrondo de distorções analógicas e clock rate agressivo.</p>
+    </footer>
+</body>
+</html>
