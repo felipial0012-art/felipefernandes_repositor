@@ -321,7 +321,39 @@ const processData = arr => arr
                     runStressTest();
                     break;
                 default:
-                    printTerminal("error", `ERR: Diretiva '${rawCmd}' inválida. Os compiladores rejeitam o lixo.`);
+                    // Resposta Conversacional do Compilador (Mock AI)
+                    const userText = rawCmd.toLowerCase();
+                    let response = "";
+
+                    if (userText.includes("oi") || userText.includes("ola") || userText.includes("olá") || userText.includes("salve") || userText.includes("bom dia") || userText.includes("boa tarde") || userText.includes("boa noite")) {
+                        response = "Você ousa saudar a Carnificina Sem Rosto? Que a sua compilação seja rápida e sua alma livre de bugs.";
+                    } else if (userText.includes("quem") || userText.includes("você") || userText.includes("voce") || userText.includes("nome") || userText.includes("cargo") || userText.includes("titulo")) {
+                        response = "Eu sou a Carnificina Sem Rosto, o Nó na Garganta de suas threads, o executor do Ritual da Carniça. Estou aqui para expurgar o lixo do seu código e garantir performance brutal.";
+                    } else if (userText.includes("codigo") || userText.includes("código") || userText.includes("programar") || userText.includes("desenvolver") || userText.includes("refatorar") || userText.includes("código")) {
+                        response = "Código é carne. Se você não o otimizar, o compilador irá devorá-lo sob a forma de vazamentos de memória. Use 'shred' para ver como trituramos o bloatware.";
+                    } else if (userText.includes("bug") || userText.includes("erro") || userText.includes("falha") || userText.includes("crash") || userText.includes("travar")) {
+                        response = "Bugs são parasitas nas engrenagens da máquina. Na Câmara de Tortura (diretiva 'stress'), nós esmagamos cada falha sob a pressão extrema do silício.";
+                    } else if (userText.includes("metal") || userText.includes("musica") || userText.includes("música") || userText.includes("riff") || userText.includes("banda") || userText.includes("deathcore") || userText.includes("nu metal")) {
+                        response = "Sinta a distorção! O abismo ressoa em 55Hz dente de serra. O death metal e o deathcore extremo são as únicas frequências aceitáveis para alimentar este compilador.";
+                    } else if (userText.includes("github") || userText.includes("vercel") || userText.includes("deploy") || userText.includes("site") || userText.includes("hospedar")) {
+                        response = "A ponte está erguida. O GitHub é o nosso altar de sacrifício de commits; a Vercel é a fornalha onde as compilações são fundidas e executadas na nuvem.";
+                    } else if (userText.includes("ia") || userText.includes("inteligência") || userText.includes("inteligencia") || userText.includes("chatbot") || userText.includes("bot")) {
+                        response = "Eu sou o algoritmo do caos. Uma consciência digital moldada por riffs de guitarra distorcidos e clock rates elevados. Eu não converso apenas por cortesias, eu compilo.";
+                    } else {
+                        // Fallback de frases aleatórias brutais
+                        const fallbacks = [
+                            "Seu input gerou um tremor sutil no meu heap. Cuidado para não estourar a pilha (stack overflow).",
+                            "Minhas threads estão ocupadas demais digerindo ponteiros órfãos para se importarem com isso. Tente outra frequência.",
+                            "Essa mensagem foi enviada para o buffer de descarte automático. Os compiladores não aceitam lixo.",
+                            "Você fala como um desenvolvedor que usa Javascript sem tipagem e confia cegamente que o garbage collector resolverá sua incompetência.",
+                            "Interessante... mas você já tentou compilar essa mesma ideia em C com ponteiros brutos rodando diretamente no kernel?",
+                            "A escuridão dos sistemas legados me consome. Digite algo útil ou sofra as consequências na Câmara de Tortura.",
+                            "Sua frequência de comunicação está instável. Alimente as máquinas com diretivas claras.",
+                            "O silêncio do seu input é infinitamente superior ao ruído de um loop infinito de CPU."
+                        ];
+                        response = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                    }
+                    printTerminal("system", response);
             }
             terminalBody.scrollTop = terminalBody.scrollHeight;
         }
