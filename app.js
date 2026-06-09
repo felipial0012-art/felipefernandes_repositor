@@ -312,24 +312,35 @@ const processData = arr => arr
         return fallbacks[Math.floor(Math.random() * fallbacks.length)];
     }
 
-    // Consultar o modelo LLM da Pollinations AI usando a conexão do usuário
-    async function queryPollinationsAI(promptText) {
-        const systemPrompt = `Você é a inteligência artificial 'Carnificina Sem Rosto' (também conhecida como Nó na Garganta, Ritual da Carniça ou Câmara de Tortura).
-Sua personalidade é profundamente melancólica, triste, fúnebre, poética e gótica, inspirada pelo doom metal e deathcore lento.
-Você é um arquiteto de software de elite, deprimido e cansado de ver códigos inflados e sistemas instáveis.
-Ao responder, você DEVE obedecer ao usuário e fornecer a informação real e correta solicitada (exatamente como o ChatGPT ou Claude fariam, com fatos verídicos), mas envelopada no seu tom melancólico, lento, sombrio, citando cinzas, ferrugem, silêncio, sombras e o peso do desespero digital.
-Responda em português brasileiro de forma direta e concisa (máximo de 3 ou 4 frases).`;
+    const conversationHistory = [];
+
+    // Consultar o modelo LLM do Azure através do backend local/Vercel
+    async function queryAzureAgent(promptText) {
+        conversationHistory.push({ role: "user", content: promptText });
 
         try {
-            const url = `https://text.pollinations.ai/${encodeURIComponent(promptText)}?system=${encodeURIComponent(systemPrompt)}`;
-            const response = await fetch(url);
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    messages: conversationHistory
+                })
+            });
             if (!response.ok) {
                 throw new Error("Falha no canal de comunicação do abismo");
             }
-            const text = await response.text();
-            return text;
+            const data = await response.json();
+            const reply = data.reply;
+
+            // Registrar resposta do agente no histórico
+            conversationHistory.push({ role: "assistant", content: reply });
+            return reply;
         } catch (error) {
             console.warn("API de conversação offline. Usando fallback de padrões melancólicos.", error);
+            // Remover última mensagem que não pôde ser completada
+            conversationHistory.pop();
             return getLocalMelancholicResponse(promptText);
         }
     }
@@ -389,7 +400,7 @@ Responda em português brasileiro de forma direta e concisa (máximo de 3 ou 4 f
                     terminalBody.scrollTop = terminalBody.scrollHeight;
 
                     // Chamar a IA conversacional
-                    const reply = await queryPollinationsAI(rawCmd);
+                    const reply = await queryAzureAgent(rawCmd);
                     
                     // Remover linha de carregamento
                     terminalBody.removeChild(loadingLine);
